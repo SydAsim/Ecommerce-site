@@ -2,7 +2,7 @@
 
 **Document Version:** 1.0  
 **Date:** November 17, 2025  
-**Author:** Grok, Senior Software Engineering Lead (xAI)  
+**Author:** Syed Asim Bacha  
 **Project:** Scalable E-Commerce API (Node.js with Express & MongoDB)  
 **Stakeholders:** Development Team, Product Owners, End-Users (Customers/Admins)  
 
@@ -384,3 +384,127 @@ These reduce admin time from hours to minutes, e.g., inventory audits now dashbo
 All prompts above are ready for tools like Draw.io (free), PlantUML (code-to-diag), or Mermaid Live. Copy-paste into the editor, export PNG/SVG. For full suite: "Bundle into a single Lucidchart canvas: ERD top-left, Use Case top-right, DFD bottom-left, Sequence bottom-right."
 
 This doc is your blueprint—comprehensive yet actionable. Implement MVP first, iterate on feedback. Questions? Let's refine. Best of luck; this will be a standout project! 
+
+Root-Level Structure
+
+ecommerce-backend/                          # Project root
+├── src/                                    # Source code (all Node.js files here)
+│   ├── domain/                             # Core entities, value objects, domain events (SRS 4.2: Domain)
+│   │   ├── entities/                       # Business objects (immutable where possible)
+│   │   │   ├── User.entity.js              # User with roles (FR-USER-01, FR-AUTH-04)
+│   │   │   ├── Product.entity.js           # Product with stock invariants (FR-PROD-01)
+│   │   │   ├── Order.entity.js             # Order with status enums (FR-ORD-02)
+│   │   │   ├── Cart.entity.js              # Cart with items (FR-CART-01)
+│   │   │   ├── Coupon.entity.js            # Coupon rules (FR-COUP-01)
+│   │   │   ├── Review.entity.js            # Review with rating (FR-REV-01)
+│   │   │   └── Category.entity.js          # Hierarchical categories (FR-PROD-04)
+│   │   ├── valueObjects/                   # Simple types (e.g., Money.vo.js for prices)
+│   │   └── events/                         # Domain events for automations (SRS 5.2)
+│   │       ├── OrderPlaced.event.js        # Triggers notifications (FR-NOT-01)
+│   │       ├── LowStock.event.js           # Inventory alerts (FR-ADMIN-01)
+│   │       └── PaymentFailed.event.js      # Fraud handling (SRS 5.1)
+│   ├── application/                        # Use cases & services (SRS 4.1: CQRS stub)
+│   │   ├── useCases/                       # Orchestrators for FRs
+│   │   │   ├── auth/                       # FR-AUTH-01-04
+│   │   │   │   ├── RegisterUser.usecase.js
+│   │   │   │   └── LoginUser.usecase.js
+│   │   │   ├── products/                   # FR-PROD-01-04
+│   │   │   │   ├── CreateProduct.usecase.js
+│   │   │   │   ├── SearchProducts.usecase.js  # With filters/aggregation
+│   │   │   │   └── UpdateStock.usecase.js     # For inventory (FR-ADMIN-01)
+│   │   │   ├── cart/                       # FR-CART-01-03
+│   │   │   │   ├── AddToCart.usecase.js
+│   │   │   │   └── GetCart.usecase.js
+│   │   │   ├── orders/                     # FR-ORD-01-03
+│   │   │   │   ├── CreateOrder.usecase.js  # Atomic transaction
+│   │   │   │   └── UpdateOrderStatus.usecase.js
+│   │   │   ├── coupons/                    # FR-COUP-01-02
+│   │   │   │   └── ApplyCoupon.usecase.js
+│   │   │   ├── payments/                   # FR-PAY-01-03
+│   │   │   │   └── ProcessPayment.usecase.js
+│   │   │   ├── users/                      # FR-USER-01-02
+│   │   │   │   └── UpdateProfile.usecase.js
+│   │   │   ├── reviews/                    # FR-REV-01-02
+│   │   │   │   └── SubmitReview.usecase.js
+│   │   │   └── notifications/              # FR-NOT-01-02
+│   │   │       └── SendNotification.usecase.js
+│   │   └── services/                       # Shared (e.g., AnalyticsService.js for FR-ANA-01-02)
+│   │       ├── InventoryService.js         # Automations for low-stock (SRS 5.2)
+│   │       ├── RecommendationService.js    # Stub for future AI (SRS 4.9)
+│   │       └── ReportService.js            # Admin reports (FR-ADMIN-04)
+│   ├── infrastructure/                     # Tech-specific impl (SRS 4.2: Infra)
+│   │   ├── persistence/                    # Repositories & schemas (Mongoose)
+│   │   │   ├── repositories/               # Abstracted data access
+│   │   │   │   ├── UserRepository.js       # Impl for User entity
+│   │   │   │   ├── ProductRepository.js    # With aggregation pipelines
+│   │   │   │   └── OrderRepository.js      # Transactional ops
+│   │   │   └── schemas/                    # Mongoose ODM (ERD in SRS 4.3)
+│   │   │       ├── User.schema.js
+│   │   │       ├── Product.schema.js       # Virtuals for avgRating
+│   │   │       └── Order.schema.js         # Embedded OrderItems
+│   │   ├── integrations/                   # Adapters for externals (SRS 3.1)
+│   │   │   ├── stripe/                     # FR-PAY-01-02
+│   │   │   │   ├── StripeAdapter.js        # Payment intents/webhooks
+│   │   │   │   └── StripeWebhookHandler.js
+│   │   │   ├── email/                      # FR-NOT-01
+│   │   │   │   └── NodemailerAdapter.js    # For confirmations/abandoned carts
+│   │   │   ├── storage/                    # FR-PROD-03
+│   │   │   │   └── CloudinaryAdapter.js    # Image uploads
+│   │   │   └── analytics/                  # FR-ANA-01-02
+│   │   │       └── MongoAnalyticsAdapter.js # Aggregation-based reports
+│   │   ├── config/                         # Centralized (SRS 2.5 Constraints)
+│   │   │   ├── database.js                 # Mongo connection w/retry
+│   │   │   ├── logger.js                   # Winston setup (SRS 3.3.6)
+│   │   │   └── swagger.js                  # API docs (SRS 3.3.4)
+│   │   └── utils/                          # Helpers (SRS 5.2 Automations)
+│   │       ├── validators.js               # Joi for inputs (SRS 3.3.2)
+│   │       ├── errors.js                   # Custom exceptions
+│   │       └── cron.js                     # For purges/timers (SRS 5.1)
+│   ├── interfaces/                         # External-facing (SRS 4.1: Presentation)
+│   │   ├── controllers/                    # HTTP handlers
+│   │   │   ├── authController.js           # Maps to auth use cases
+│   │   │   ├── productController.js
+│   │   │   ├── cartController.js
+│   │   │   ├── orderController.js
+│   │   │   ├── adminController.js          # Dashboard endpoints (FR-ADMIN-01-04)
+│   │   │   └── reviewController.js
+│   │   ├── routes/                         # Express routers (versioned /api/v1)
+│   │   │   ├── auth.routes.js
+│   │   │   ├── products.routes.js          # Public filters
+│   │   │   ├── cart.routes.js              # Protected
+│   │   │   ├── orders.routes.js            # Checkout/webhooks
+│   │   │   ├── admin.routes.js             # /admin/* w/RBAC (SRS 3.2.8)
+│   │   │   └── index.js                    # Mount all
+│   │   └── middleware/                     # Cross-cutting (SRS 3.3.2 Security)
+│   │       ├── auth.js                     # JWT/RBAC guards
+│   │       ├── validation.js               # Joi middleware
+│   │       ├── errorHandler.js             # Global (SRS 3.3.3)
+│   │       ├── rateLimit.js                # Throttling
+│   │       └── upload.js                   # Multer for images
+│   └── modules/                            # Optional: Per-SRS-module grouping (for large teams)
+│       ├── admin/                          # FR-ADMIN-01-04: Dashboard-specific
+│       │   ├── dashboard/                  # Widgets/reports
+│       │   │   ├── inventoryWidget.js      # Real-time stock (SRS 5.2)
+│       │   │   └── salesReport.js
+│       │   └── moderation/                 # User/order ops
+│       │       └── userBan.usecase.js
+│       └── analytics/                      # FR-ANA-01-02: Shared across
+│           └── retentionCalculator.js
+├── tests/                                  # Unit/integration (SRS 3.3.6: 80% coverage)
+│   ├── unit/                               # Domain/use cases
+│   │   └── domain.entities.test.js
+│   ├── integration/                        # End-to-end flows
+│   │   └── orderCheckout.flow.test.js      # Simulates concurrency (SRS 5.1)
+│   └── e2e/                                # API tests w/Supertest
+│       └── adminDashboard.test.js
+├── docs/                                   # Generated/ manual (SRS 3.3.4)
+│   ├── api/                                # Swagger JSON
+│   └── diagrams/                           # ERD/DFD exports (from prompts in SRS 4.3-4.8)
+├── .env.example                            # Template (SRS 2.6 Dependencies)
+├── .gitignore
+├── Dockerfile                              # For deployment (SRS 4.8)
+├── docker-compose.yml                      # Local Mongo/Stripe mocks
+├── package.json                            # Deps/scripts (e.g., "test": "jest")
+├── README.md                               # Quick start, tied to SRS phases
+└── server.js                               # Bootstrap: Connect infra, start app
+
