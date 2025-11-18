@@ -1,0 +1,58 @@
+{
+  "name": "ecommerce-website",
+  "version": "1.0.0",
+  "description": "ecommerce backend ",
+  "keywords": [
+    "ecommerce",
+    "node",
+    "js",
+    "clean",
+    "archititecture"
+  ],
+  "homepage": "https://github.com/SydAsim/Ecommerce-site#readme",
+  "bugs": {
+    "url": "https://github.com/SydAsim/Ecommerce-site/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SydAsim/Ecommerce-site.git"
+  },
+  "license": "MIT",
+  "author": "Syed Asim Bacha",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "jest --detectOpenHandles",
+    "dev": "nodemon src/server.js",
+    "lint": "eslint src --ext .js",
+    "format": "prettier --write .",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.8.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.20.0",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.2",
+    "stripe": "^19.3.1",
+    "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.1",
+    "husky": "^9.1.7",
+    "jest": "^29.7.0",
+    "lint-staged": "^16.2.6",
+    "nodemon": "^3.1.11",
+    "prettier": "^3.6.2",
+    "supertest": "^7.1.4"
+  }
+}
