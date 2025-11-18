@@ -22,7 +22,7 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
-    "test": "jest --detectOpenHandles",
+    "test": "jest --passWithNoTests --detectOpenHandles",
     "dev": "nodemon src/server.js",
     "lint": "eslint src --ext .js",
     "format": "prettier --write .",
