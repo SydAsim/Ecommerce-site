@@ -23,7 +23,7 @@
   "main": "src/server.js",
   "scripts": {
     "test": "jest --passWithNoTests --detectOpenHandles",
-    "dev": "nodemon -r dotenv/config   --experimental-json-modules  src/index.js", 
+    "dev": "nodemon -r dotenv/config   --experimental-json-modules  server.js", 
     "lint": "eslint src --ext .js",
     "format": "prettier --write .",
     "prepare": "husky"
