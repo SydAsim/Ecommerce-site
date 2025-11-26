@@ -1,43 +1,60 @@
-import mongoose,{Schema} from "mongoose";
-
+import mongoose, { Schema } from "mongoose";
 
 const couponSchema = new Schema({
-    code : {
-        type : String,
-        required : [true ,"code is required"],
-    },
+  code: {
+    type: String,
+    required: true,
+    unique: true,
+    uppercase: true,
+    trim: true,
+  },
 
-    discount : { 
-        type : String,
-        required : [true , "Discount is Rquired"],
-    },
-
-    expiry : { 
-        type : Number, 
-        required : [true , "Expiry is Rquired"]
-    },
-
-    minamount : {
-        type : Number,
-        required : [true , "minamount  is Rquired"]
-    },
-    
-    maxuses :{
-        type : Number,
-        required : [true , "maxuses is Rquired"],
-        default : 0
-    },
-
-    usedby :  {
-        type : Schema.Types.ObjectId,
-        ref : "User",
-        enum: ["customer", "admin"], //only these values are allowedenum is your security guard + typo protector for roles, statuses, payment methods, etc.
-       default: "customer",
-
-    },
+  discountType: {
+    type: String,
+    enum: ["percentage", "fixed"],
+    default: "percentage",
+  },
 
 
+  discountValue: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
 
-},{timeseries : true} ,{timestamps : true})
 
-export const Coupon = mongoose.model("Coupon" , couponSchema)
+  minAmount: {
+    type: Number,
+    default: 0,
+  },
+
+  maxUses: {
+    type: Number,
+    default: null,
+  },
+
+
+  usedCount: {
+    type: Number,
+    default: 0,
+  },
+
+
+  expiresAt: {
+    type: Date,
+    required: true,
+  },
+  
+
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
+
+
+}, { timestamps: true });
+
+couponSchema.index({ code: 1 });
+couponSchema.index({ expiresAt: 1 });
+
+export const Coupon = mongoose.model("Coupon", couponSchema);
