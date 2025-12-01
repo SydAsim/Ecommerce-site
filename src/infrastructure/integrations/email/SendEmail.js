@@ -24,5 +24,5 @@ export const sendEmail = async ({ to, subject, html, text }) => {
   } catch (error) {
     // console.error("Resend failed:", error.message);
     throw new ApiError("Failed to send email");
-  }
+  } 
 };
