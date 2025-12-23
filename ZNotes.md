@@ -1,10 +1,27 @@
-You are exactly right in your thinking: the logical next step is to build the Repositories and then the Controllers to expose the functionality. However, in a Hexagonal Architecture, we must define the Use Cases first, which bridge the Controllers (Interfaces) and the Repositories (Infrastructure).
+POST /api/v1/auth/register
+       ↓
+routes/auth.routes.js → registerUser controller
+       ↓
+controllers/AuthController.js → thin handler → calls RegisterUser.useCase.execute()
+       ↓
+application/useCases/auth/RegisterUser.js → business logic + validation
+       ↓
+infrastructure/persistence/repositories/UserRepository.js → DB operations
+       ↓
+infrastructure/persistence/schemas/User.schema.js → Mongoose model
+       ↓
+MongoDB → saves user
+       ↑
+Response → 201 + user data (no password)
+
+
+
+
+ in a Hexagonal Architecture, we must define the Use Cases first, which bridge the Controllers (Interfaces) and the Repositories (Infrastructure).
 
 Before writing controllers, you need code that talks to your schemas. 
 
-
-
-1.🧠 Develop Application Use Cases
+1.Develop Application Use Cases
 This layer contains your business logic. These are the core functions of your application and directly use the Repositories defined above.
 
 Goal: Define the what (the business logic) before defining the how (the HTTP route).

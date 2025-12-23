@@ -1,3 +1,4 @@
+// src/infrastructure/persistence/schemas/Order.schema.js
 import mongoose, { Schema } from "mongoose";
 
 
@@ -25,8 +26,6 @@ const orderItemSchema = new Schema({
   image: String,
 });
 
-
-
 const orderSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
@@ -36,9 +35,18 @@ const orderSchema = new Schema({
 
   items: [orderItemSchema],
 
+  // FULL IMMUTABLE SHIPPING ADDRESS SNAPSHOT
+  // Same principle as product items: if user changes/deletes address later,
+  // this order must still show exactly where it was shipped
   shippingAddress: {
-    type: String,
-    required: true,
+    recipientName: { type: String, required: true },
+    phone: { type: String, required: true },
+    street1: { type: String, required: true },
+    street2: { type: String },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    postalCode: { type: String, required: true },
+    country: { type: String, required: true },
   },
 
   paymentMethod: {
@@ -85,6 +93,7 @@ const orderSchema = new Schema({
 
 }, { timestamps: true });
 
+// Indexes for performance
 orderSchema.index({ user: 1, createdAt: -1 });
 orderSchema.index({ status: 1 });
 

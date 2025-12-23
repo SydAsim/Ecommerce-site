@@ -10,7 +10,7 @@ const userSchema = new Schema(
       required: [true, "Name is required"],
       trim: true,
       minlength: [2, "Name must be at least 2 characters"],
-      maxlength: ["Name cannot exceed 50 characters"],
+      maxlength: [50,"Name cannot exceed 50 characters"],
     },
 
     email: {
@@ -43,12 +43,7 @@ const userSchema = new Schema(
         return `https://ui-avatars.com/api/?name=${encodeURIComponent(this.name)}&background=ff6b6b&color=fff&rounded=true&size=128&font-size=0.5&bold=true`;
       },
     },
-    address: {
-      type: String,
-      required: [true, "Shipping address is required"],
-    },
-
-   
+  
     refreshToken: 
     { type: String, select: false },
 
@@ -62,16 +57,18 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-
-userSchema.index({ email: 1 });
+// Indexes
+// userSchema.index({ email: 1 });
 userSchema.index({ role: 1 });
 
+// Pre-save hook
 userSchema.pre("save", async function(next) {
   if(!this.isModified("password")) return next()
   this.password = await bcrypt.hash(this.password , 12)
  next()
 })
 
+// Methods
 userSchema.methods.isPasswordCorrect  = async function (password){
    return await bcrypt.compare(password , this.password )
 }
